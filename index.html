@@ -219,7 +219,7 @@
       <div id="page-clientes" class="page hidden space-y-6">
         <div class="flex items-center justify-between">
           <div><h1 class="text-2xl font-bold">Clientes</h1><p class="mt-1 text-sm text-zinc-400">87 clientes ativos</p></div>
-          <button class="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500">+ Novo Cliente</button>
+          <button onclick="openModal('modal-cliente')" class="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500">+ Novo Cliente</button>
         </div>
         <div class="overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900/50">
           <table class="w-full text-sm">
@@ -237,7 +237,7 @@
       <div id="page-produtos" class="page hidden space-y-6">
         <div class="flex items-center justify-between">
           <div><h1 class="text-2xl font-bold">Produtos</h1><p class="mt-1 text-sm text-zinc-400">34 produtos cadastrados</p></div>
-          <button class="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500">+ Novo Produto</button>
+          <button onclick="openModal('modal-produto')" class="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500">+ Novo Produto</button>
         </div>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" id="produtos-grid"></div>
       </div>
@@ -269,7 +269,7 @@
       <div id="page-pedidos" class="page hidden space-y-6">
         <div class="flex items-center justify-between">
           <div><h1 class="text-2xl font-bold">Pedidos</h1><p class="mt-1 text-sm text-zinc-400">Pipeline completo de vendas</p></div>
-          <button class="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500">+ Novo Pedido</button>
+          <button onclick="openModal('modal-pedido')" class="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500">+ Novo Pedido</button>
         </div>
         <!-- Pipeline visual -->
         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6" id="pedidos-pipeline"></div>
@@ -315,7 +315,7 @@
       <div id="page-promocoes" class="page hidden space-y-6">
         <div class="flex items-center justify-between">
           <div><h1 class="text-2xl font-bold">Promoções</h1><p class="mt-1 text-sm text-zinc-400">Campanhas e descontos</p></div>
-          <button class="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500">+ Nova Promoção</button>
+          <button onclick="openModal('modal-promocao')" class="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500">+ Nova Promoção</button>
         </div>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" id="promocoes-grid"></div>
       </div>
@@ -628,6 +628,339 @@
     renderFinanceiro()
     renderRepresentantes()
     renderPromocoes()
+  </script>
+
+
+  <!-- ============================================================ -->
+  <!-- MODAIS -->
+  <!-- ============================================================ -->
+  <style>
+    .modal-overlay { display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:1rem; }
+    .modal-overlay.open { display:flex; }
+    .modal-box { background:#18181b; border:1px solid #27272a; border-radius:1rem; width:100%; max-width:540px; max-height:90vh; overflow-y:auto; animation:slideUp 0.2s ease; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .form-label { display:block; font-size:.75rem; color:#a1a1aa; margin-bottom:.25rem; }
+    .form-input { width:100%; background:#09090b; border:1px solid #27272a; border-radius:.5rem; padding:.5rem .75rem; font-size:.875rem; color:white; outline:none; transition:border-color .15s; }
+    .form-input:focus { border-color:#7c3aed; }
+    .form-select { width:100%; background:#09090b; border:1px solid #27272a; border-radius:.5rem; padding:.5rem .75rem; font-size:.875rem; color:white; outline:none; }
+    .form-select:focus { border-color:#7c3aed; }
+  </style>
+
+  <!-- MODAL: Novo Cliente -->
+  <div id="modal-cliente" class="modal-overlay" onclick="closeModalOutside(event,'modal-cliente')">
+    <div class="modal-box">
+      <div class="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
+        <h2 class="text-lg font-semibold">Novo Cliente</h2>
+        <button onclick="closeModal('modal-cliente')" class="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-white">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form onsubmit="saveCliente(event)" class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="col-span-2"><label class="form-label">Nome completo *</label><input id="c-nome" required placeholder="Dr. João Silva" class="form-input"></div>
+          <div>
+            <label class="form-label">Tipo de profissional *</label>
+            <select id="c-tipo" required class="form-select">
+              <option value="">Selecionar...</option>
+              <option>Médico</option><option>Médica</option><option>Dentista</option>
+              <option>Biomédico</option><option>Biomédica</option><option>Farmacêutico</option><option>Farmacêutica</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Conselho profissional</label>
+            <select id="c-conselho" class="form-select">
+              <option value="">Selecionar...</option>
+              <option>CRM</option><option>CRO</option><option>CRBM</option><option>CRF</option>
+            </select>
+          </div>
+          <div><label class="form-label">Número do conselho</label><input id="c-num-conselho" placeholder="12345" class="form-input"></div>
+          <div><label class="form-label">CPF / CNPJ</label><input id="c-cpf" placeholder="000.000.000-00" class="form-input"></div>
+          <div><label class="form-label">E-mail</label><input id="c-email" type="email" placeholder="joao@clinica.com" class="form-input"></div>
+          <div><label class="form-label">Telefone</label><input id="c-tel" placeholder="(11) 99999-9999" class="form-input"></div>
+          <div><label class="form-label">WhatsApp</label><input id="c-whats" placeholder="(11) 99999-9999" class="form-input"></div>
+          <div><label class="form-label">Cidade</label><input id="c-cidade" placeholder="São Paulo" class="form-input"></div>
+          <div>
+            <label class="form-label">Estado</label>
+            <select id="c-estado" class="form-select">
+              <option value="">UF</option>
+              <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option selected>SP</option><option>SE</option><option>TO</option>
+            </select>
+          </div>
+          <div class="col-span-2"><label class="form-label">Observações</label><textarea id="c-obs" rows="2" placeholder="Informações adicionais..." class="form-input"></textarea></div>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="closeModal('modal-cliente')" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm hover:bg-zinc-800">Cancelar</button>
+          <button type="submit" class="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500">Salvar Cliente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Novo Produto -->
+  <div id="modal-produto" class="modal-overlay" onclick="closeModalOutside(event,'modal-produto')">
+    <div class="modal-box">
+      <div class="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
+        <h2 class="text-lg font-semibold">Novo Produto</h2>
+        <button onclick="closeModal('modal-produto')" class="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-white">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form onsubmit="saveProduto(event)" class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="col-span-2"><label class="form-label">Nome do produto *</label><input id="p-nome" required placeholder="Botox 100U" class="form-input"></div>
+          <div>
+            <label class="form-label">Categoria *</label>
+            <select id="p-cat" required class="form-select">
+              <option value="">Selecionar...</option>
+              <option>Toxina Botulínica</option><option>Ácido Hialurônico</option><option>Fios</option>
+              <option>Bioestimuladores</option><option>Enzimas</option><option>Skinbooster</option>
+              <option>Preenchedores</option><option>Anestésicos</option><option>Equipamentos</option><option>Consumíveis</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Marca *</label>
+            <select id="p-marca" required class="form-select">
+              <option value="">Selecionar...</option>
+              <option>Allergan (AbbVie)</option><option>Galderma</option>
+              <option>Istochem (Istopharm)</option><option>Bioformula</option><option>Outro</option>
+            </select>
+          </div>
+          <div><label class="form-label">Preço de custo (R$) *</label><input id="p-custo" required type="number" step="0.01" placeholder="0,00" class="form-input"></div>
+          <div><label class="form-label">Preço de venda (R$) *</label><input id="p-venda" required type="number" step="0.01" placeholder="0,00" class="form-input"></div>
+          <div><label class="form-label">Número ANVISA</label><input id="p-anvisa" placeholder="Ex: 1234.5678" class="form-input"></div>
+          <div><label class="form-label">Código de barras</label><input id="p-barras" placeholder="EAN / código" class="form-input"></div>
+          <div>
+            <label class="form-label">Temperatura de armazenamento</label>
+            <select id="p-temp" class="form-select">
+              <option>Ambiente (15–25°C)</option>
+              <option>Refrigerado (2–8°C)</option>
+              <option>Congelado (-20°C)</option>
+            </select>
+          </div>
+          <div><label class="form-label">Qtd. mínima em estoque</label><input id="p-qtdmin" type="number" value="5" class="form-input"></div>
+          <div class="col-span-2"><label class="form-label">Descrição</label><textarea id="p-desc" rows="2" placeholder="Descrição do produto..." class="form-input"></textarea></div>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="closeModal('modal-produto')" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm hover:bg-zinc-800">Cancelar</button>
+          <button type="submit" class="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500">Salvar Produto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Novo Pedido -->
+  <div id="modal-pedido" class="modal-overlay" onclick="closeModalOutside(event,'modal-pedido')">
+    <div class="modal-box">
+      <div class="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
+        <h2 class="text-lg font-semibold">Novo Pedido</h2>
+        <button onclick="closeModal('modal-pedido')" class="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-white">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form onsubmit="savePedido(event)" class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="col-span-2">
+            <label class="form-label">Cliente *</label>
+            <select id="ped-cliente" required class="form-select">
+              <option value="">Selecionar cliente...</option>
+              <option>Dr. João Silva</option><option>Dra. Maria Santos</option>
+              <option>Dr. Carlos Pereira</option><option>Dra. Ana Costa</option>
+              <option>Dr. Roberto Lima</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Representante</label>
+            <select id="ped-rep" class="form-select">
+              <option value="">Sem representante</option>
+              <option>Carlos Vendedor</option><option>Sandra Vendas</option><option>Paulo Oliveira</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Forma de pagamento *</label>
+            <select id="ped-pagto" required class="form-select">
+              <option value="">Selecionar...</option>
+              <option>PIX</option><option>Boleto</option><option>Cartão</option><option>Transferência</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Tipo de entrega</label>
+            <select id="ped-entrega" class="form-select">
+              <option>Entrega</option><option>Retirada</option>
+            </select>
+          </div>
+          <div><label class="form-label">Frete (R$)</label><input id="ped-frete" type="number" step="0.01" value="0" class="form-input"></div>
+        </div>
+        <!-- Itens -->
+        <div class="border border-zinc-800 rounded-lg overflow-hidden">
+          <div class="flex items-center justify-between bg-zinc-900 px-4 py-2.5">
+            <span class="text-sm font-medium">Itens do Pedido</span>
+            <button type="button" onclick="addItemPedido()" class="text-xs text-violet-400 hover:text-violet-300">+ Adicionar item</button>
+          </div>
+          <div id="pedido-itens" class="divide-y divide-zinc-800">
+            <div class="grid grid-cols-12 gap-2 p-3 items-end">
+              <div class="col-span-5"><label class="form-label">Produto</label>
+                <select class="form-select">
+                  <option>Botox 100U</option><option>Dysport 300U</option>
+                  <option>Ácido Hialurônico 1ml</option><option>Fios de PDO 29G</option>
+                </select>
+              </div>
+              <div class="col-span-2"><label class="form-label">Qtd</label><input type="number" value="1" min="1" class="form-input"></div>
+              <div class="col-span-3"><label class="form-label">Preço unit.</label><input type="number" value="1200.00" step="0.01" class="form-input"></div>
+              <div class="col-span-2 flex items-end"><button type="button" onclick="this.closest('.grid').remove()" class="w-full rounded bg-zinc-800 p-2 text-zinc-400 hover:text-rose-400">✕</button></div>
+            </div>
+          </div>
+        </div>
+        <div><label class="form-label">Observações</label><textarea id="ped-obs" rows="2" placeholder="Informações adicionais..." class="form-input"></textarea></div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="closeModal('modal-pedido')" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm hover:bg-zinc-800">Cancelar</button>
+          <button type="submit" class="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500">Criar Pedido</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Nova Promoção -->
+  <div id="modal-promocao" class="modal-overlay" onclick="closeModalOutside(event,'modal-promocao')">
+    <div class="modal-box">
+      <div class="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
+        <h2 class="text-lg font-semibold">Nova Promoção</h2>
+        <button onclick="closeModal('modal-promocao')" class="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-white">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form onsubmit="savePromocao(event)" class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="col-span-2"><label class="form-label">Título da promoção *</label><input id="pr-titulo" required placeholder="Botox 100U - 20% OFF" class="form-input"></div>
+          <div class="col-span-2">
+            <label class="form-label">Produto *</label>
+            <select id="pr-produto" required class="form-select">
+              <option value="">Selecionar produto...</option>
+              <option>Botox 100U</option><option>Dysport 300U</option>
+              <option>Ácido Hialurônico 1ml</option><option>Radiesse 1.5ml</option>
+              <option>Fios de PDO 29G</option><option>Hyaluronidase 1500UI</option>
+            </select>
+          </div>
+          <div><label class="form-label">Desconto (%) *</label><input id="pr-desconto" required type="number" min="1" max="99" placeholder="20" class="form-input"></div>
+          <div><label class="form-label">Preço promocional (R$)</label><input id="pr-preco" type="number" step="0.01" placeholder="Opcional" class="form-input"></div>
+          <div><label class="form-label">Data início *</label><input id="pr-inicio" required type="date" class="form-input"></div>
+          <div><label class="form-label">Data fim *</label><input id="pr-fim" required type="date" class="form-input"></div>
+          <div class="col-span-2"><label class="form-label">Descrição</label><textarea id="pr-desc" rows="2" placeholder="Detalhes da campanha..." class="form-input"></textarea></div>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="closeModal('modal-promocao')" class="rounded-lg border border-zinc-700 px-4 py-2 text-sm hover:bg-zinc-800">Cancelar</button>
+          <button type="submit" class="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500">Salvar Promoção</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Toast de sucesso -->
+  <div id="toast" class="fixed bottom-6 right-6 z-[200] hidden">
+    <div class="flex items-center gap-3 rounded-xl border border-emerald-500/20 bg-zinc-900 px-5 py-3 shadow-2xl">
+      <span class="text-emerald-400 text-lg">✓</span>
+      <span id="toast-msg" class="text-sm font-medium"></span>
+    </div>
+  </div>
+
+  <script>
+    // --- MODAL HELPERS ---
+    function openModal(id) {
+      document.getElementById(id).classList.add('open')
+      document.body.style.overflow = 'hidden'
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open')
+      document.body.style.overflow = ''
+    }
+    function closeModalOutside(e, id) {
+      if (e.target.id === id) closeModal(id)
+    }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id))
+    })
+
+    function showToast(msg) {
+      const t = document.getElementById('toast')
+      document.getElementById('toast-msg').textContent = msg
+      t.classList.remove('hidden')
+      setTimeout(() => t.classList.add('hidden'), 3000)
+    }
+
+    // --- SAVE HANDLERS ---
+    function saveCliente(e) {
+      e.preventDefault()
+      const nome = document.getElementById('c-nome').value
+      const tipo = document.getElementById('c-tipo').value
+      const conselho = document.getElementById('c-conselho').value
+      const numConselho = document.getElementById('c-num-conselho').value
+      const cidade = document.getElementById('c-cidade').value
+      const estado = document.getElementById('c-estado').value
+      clientes.push({ nome, tipo, conselho: conselho + (numConselho ? ' ' + numConselho : ''), cidade: cidade + (estado ? '/' + estado : ''), total: 0, ativo: true })
+      renderClientes()
+      closeModal('modal-cliente')
+      e.target.reset()
+      showToast(`Cliente "${nome}" cadastrado com sucesso!`)
+    }
+
+    function saveProduto(e) {
+      e.preventDefault()
+      const nome = document.getElementById('p-nome').value
+      const marca = document.getElementById('p-marca').value
+      const categoria = document.getElementById('p-cat').value
+      const preco = parseFloat(document.getElementById('p-venda').value)
+      const cores = ['from-violet-500 to-purple-500','from-cyan-500 to-blue-500','from-pink-500 to-rose-500','from-amber-500 to-orange-500','from-emerald-500 to-teal-500','from-indigo-500 to-violet-500']
+      produtos.push({ nome, marca, categoria, preco, estoque: 0, cor: cores[produtos.length % cores.length] })
+      renderProdutos()
+      closeModal('modal-produto')
+      e.target.reset()
+      showToast(`Produto "${nome}" cadastrado com sucesso!`)
+    }
+
+    function savePedido(e) {
+      e.preventDefault()
+      const cliente = document.getElementById('ped-cliente').value
+      const pagto = document.getElementById('ped-pagto').value
+      const num = 'PED-2026-' + String(pedidos.length + 43).padStart(4,'0')
+      const hoje = new Date().toLocaleDateString('pt-BR')
+      pedidos.unshift({ num, cliente, status: 'pedido_criado', valor: 0, data: hoje, pagto })
+      renderPedidos()
+      renderPedidosTable()
+      closeModal('modal-pedido')
+      e.target.reset()
+      showToast(`Pedido ${num} criado com sucesso!`)
+    }
+
+    function savePromocao(e) {
+      e.preventDefault()
+      const titulo = document.getElementById('pr-titulo').value
+      const produto = document.getElementById('pr-produto').value
+      const desconto = parseInt(document.getElementById('pr-desconto').value)
+      const inicio = document.getElementById('pr-inicio').value.split('-').reverse().join('/')
+      const fim = document.getElementById('pr-fim').value.split('-').reverse().join('/')
+      promocoes.push({ titulo, produto, desconto, inicio, fim, ativa: true })
+      renderPromocoes()
+      closeModal('modal-promocao')
+      e.target.reset()
+      showToast(`Promoção "${titulo}" criada com sucesso!`)
+    }
+
+    function addItemPedido() {
+      const container = document.getElementById('pedido-itens')
+      const div = document.createElement('div')
+      div.className = 'grid grid-cols-12 gap-2 p-3 items-end'
+      div.innerHTML = `
+        <div class="col-span-5"><label class="form-label">Produto</label>
+          <select class="form-select">
+            <option>Botox 100U</option><option>Dysport 300U</option>
+            <option>Ácido Hialurônico 1ml</option><option>Fios de PDO 29G</option>
+          </select>
+        </div>
+        <div class="col-span-2"><label class="form-label">Qtd</label><input type="number" value="1" min="1" class="form-input"></div>
+        <div class="col-span-3"><label class="form-label">Preço unit.</label><input type="number" value="0.00" step="0.01" class="form-input"></div>
+        <div class="col-span-2 flex items-end"><button type="button" onclick="this.closest('.grid').remove()" class="w-full rounded bg-zinc-800 p-2 text-zinc-400 hover:text-rose-400">✕</button></div>
+      `
+      container.appendChild(div)
+    }
   </script>
 </body>
 </html>
